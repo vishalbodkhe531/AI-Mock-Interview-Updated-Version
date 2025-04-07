@@ -15,7 +15,28 @@ export async function storeData({ parseResult, userInfo }: PropesType) {
   return response.data;
 }
 
-export async function fetchData({ id }: { id: string }) {
-  const response = await axios.get(`http://localhost:3000/api/user/${id}`);
+export async function fetchInterview({ id }: { id: string }) {
+  const response = await axios.get(`http://localhost:3000/api/interview/${id}`);
   return response.data;
+}
+
+export async function fetchAllInterviews({ id }: { id: string }) {
+  try {
+    if (!id) {
+      return {
+        success: false,
+        message: "Id is required",
+      };
+    }
+
+    const response = await axios.get(
+      `http://localhost:3000/api/interview/all/${id}`
+    );
+    return response.data;
+  } catch (error) {
+    return {
+      success: false,
+      message: "Error while fetching interview data",
+    };
+  }
 }
