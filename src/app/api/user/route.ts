@@ -1,0 +1,71 @@
+"use server";
+
+import { prisma } from "@/lib/prisma";
+import { NextResponse } from "next/server";
+
+export async function POST(req: Request) {
+  try {
+    const { parseResult, userInfo } = await req.json();
+
+    if (!parseResult || !userInfo)
+      NextResponse.json("Somethink went wrong, Try again !");
+
+    const { userId, userName, profilePic, role, experience, jobDesc } =
+      userInfo;
+
+    const isUserExist = await prisma.user.findUnique({
+      where: {
+        uid: userId,
+      },
+    });
+
+    console.log("isUserExist : ", isUserExist);
+
+    if (isUserExist) {
+      const mockResponse = await prisma.mockInterview.create({
+        data: {
+          jsonMockResp: parseResult,
+          userId,
+          jobDesc,
+          role,
+          experience,
+        },
+      });
+
+      return NextResponse.json({
+        sucess: true,
+        mockId: mockResponse.id,
+        message: "Data successfully store into the database",
+      });
+    }
+
+    await prisma.user.create({
+      data: {
+        uid: userId,
+        userName,
+        profilePic,
+      },
+    });
+
+    const mockResponse = await prisma.mockInterview.create({
+      data: {
+        jsonMockResp: parseResult,
+        userId,
+        jobDesc,
+        role,
+        experience,
+      },
+    });
+
+    return NextResponse.json({
+      sucess: true,
+      mockId: mockResponse.id,
+      message: "Data successfully store into the database",
+    });
+  } catch (error) {
+    return NextResponse.json(
+      { error: "Error while store interview data" },
+      { status: 400 }
+    );
+  }
+}

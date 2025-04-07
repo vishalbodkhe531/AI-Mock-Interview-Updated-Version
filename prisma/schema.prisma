@@ -1,0 +1,26 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  uid        String @id @unique
+  userName   String?
+  profilePic String?
+  mocks      MockInterview[]
+}
+
+model MockInterview {
+  id           String    @id @default(cuid()) @unique
+  jsonMockResp Json
+  jobDesc     String
+  role         String
+  experience   String  
+  userId       String  
+  user         User      @relation(fields: [userId], references: [uid], onDelete: Cascade)
+  @@map("mockInterview")
+}
