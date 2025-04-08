@@ -33,9 +33,7 @@ const InterviewListPage = () => {
   const router = useRouter();
   const { user } = useUser();
   const [interviewData, setInterviewData] = useState<Interview[]>([]);
-  const [loading, setLoading] = useState<boolean>(true); // 👈 Add loading state
-
-  console.log("interviewData : ", interviewData);
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     const fetchData = async () => {
