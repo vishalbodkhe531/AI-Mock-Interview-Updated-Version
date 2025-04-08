@@ -1,19 +1,8 @@
+import Navbar from "@/components/Navbar";
 import { ClerkProvider } from "@clerk/nextjs";
 import { type Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import Header from "./dashboard/_components/Header";
-import "./globals.css";
 import { ThemeProvider } from "next-themes";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Clerk Next.js Quickstart",
@@ -40,7 +29,7 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            <Header />
+            <Navbar />
             <div className="mx-5 md:mc-20 lg:mx-36 ">{children}</div>
           </ThemeProvider>
         </body>

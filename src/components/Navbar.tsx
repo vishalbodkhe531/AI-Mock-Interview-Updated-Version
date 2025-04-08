@@ -18,7 +18,7 @@ import { MdDashboard } from "react-icons/md";
 import { FaQuestion } from "react-icons/fa";
 import { HiSparkles } from "react-icons/hi";
 
-function Header() {
+function Navbar() {
   const path = usePathname();
   const { theme } = useTheme();
   const [mounted, setMounted] = useState(false);
@@ -96,4 +96,4 @@ function Header() {
   );
 }
 
-export default Header;
+export default Navbar;
