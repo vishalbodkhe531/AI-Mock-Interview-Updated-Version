@@ -9,17 +9,11 @@ export async function GET(
   try {
     const { id } = await params;
 
-    console.log(id);
-
     if (!id) {
       return NextResponse.json({ error: "Invalid ID" }, { status: 400 });
     }
 
-    const result = await prisma.mockInterview.findMany({
-      where: { userId: id },
-    });
-
-    console.log(result);
+    const result = await prisma.mockInterview.findUnique({ where: { id } });
 
     if (!result) {
       return NextResponse.json(
@@ -40,4 +34,3 @@ export async function GET(
     );
   }
 }
-

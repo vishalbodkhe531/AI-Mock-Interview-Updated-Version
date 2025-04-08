@@ -7,6 +7,7 @@ import { Lightbulb, LightbulbOffIcon, Volume2, VolumeOff } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import toast from "react-hot-toast";
+import Loading from "./loading";
 
 function QuestionSection({
   setCurrentQuestion,
@@ -82,10 +83,7 @@ function QuestionSection({
     [interviewData, activeQuestionIdx]
   );
 
-  if (loading) {
-    return <div className="text-center mt-20">Loading...</div>;
-  }
-
+  if (loading) return <Loading />;
   if (interviewData.length === 0) {
     return (
       <div className="text-center mt-20">

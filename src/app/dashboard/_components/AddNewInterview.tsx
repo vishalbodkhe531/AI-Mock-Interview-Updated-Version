@@ -17,7 +17,8 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { storeData } from "@/lib/user.action";
+import { createInterview } from "@/lib/user.action";
+
 import { formType, UserDataType } from "@/types/user.types";
 import { chatSession } from "@/utils/gemeniAIMode";
 import { useUser } from "@clerk/nextjs";
@@ -44,7 +45,6 @@ function AddNewInterview() {
 
   const router = useRouter();
   const { user } = useUser();
-  
 
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -106,7 +106,7 @@ function AddNewInterview() {
         : [];
 
       try {
-        const apiResponse = await storeData({ parseResult, userInfo });
+        const apiResponse = await createInterview({ parseResult, userInfo });
         toast.success(apiResponse.message);
         console.log("apiResponse mockId : ", apiResponse.mockId);
         router.push(`/dashboard/interview/${apiResponse.mockId}`);

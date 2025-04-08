@@ -31,13 +31,14 @@ export default function RootLayout({
         lang="en"
         suppressHydrationWarning
         className=" overflow-y-scroll  scrollbar-hidden"
-      > 
+      >
+        <title>Interview AI</title>
         <body>
           <ThemeProvider
             attribute="class"
             defaultTheme="system"
             enableSystem
-            disableTransitionOnChange 
+            disableTransitionOnChange
           >
             <Header />
             <div className="mx-5 md:mc-20 lg:mx-36 ">{children}</div>
