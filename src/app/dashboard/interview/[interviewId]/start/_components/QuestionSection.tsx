@@ -22,6 +22,8 @@ function QuestionSection({
   const [hint, setHint] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
 
+  console.log(interviewData);
+
   const speechRef = useRef<SpeechSynthesisUtterance | null>(null);
 
   useEffect(() => {
@@ -31,6 +33,7 @@ function QuestionSection({
       try {
         setLoading(true);
         const res = await fetchInterview({ id: interviewId as string });
+        console.log(res);
         const { jsonMockResp } = res?.result;
         if (jsonMockResp?.length) {
           setInterviewData(jsonMockResp);

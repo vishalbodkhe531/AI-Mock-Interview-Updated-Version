@@ -7,7 +7,9 @@ import { fetchAllInterviews } from "@/lib/user.action";
 import { useUser } from "@clerk/nextjs";
 import { motion } from "framer-motion";
 import { Briefcase, Code, Database } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { JSX, useEffect, useState } from "react";
+import Loading from "./loading";
 
 interface Interview {
   title: string;
@@ -28,20 +30,26 @@ const roleIcons: Record<string, JSX.Element> = {
 };
 
 const InterviewListPage = () => {
+  const router = useRouter();
   const { user } = useUser();
   const [interviewData, setInterviewData] = useState<Interview[]>([]);
+  const [loading, setLoading] = useState<boolean>(true); // 👈 Add loading state
 
   console.log("interviewData : ", interviewData);
 
   useEffect(() => {
     const fetchData = async () => {
       if (user?.id) {
+        setLoading(true);
         const data = await fetchAllInterviews({ id: user.id });
         setInterviewData(data);
+        setLoading(false);
       }
     };
     fetchData();
   }, [user?.id]);
+
+  if (loading) return <Loading />;
 
   return (
     <main className="min-h-screen px-6 md:px-20 py-12 bg-background text-foreground select-none">
@@ -62,7 +70,12 @@ const InterviewListPage = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.1 }}
           >
-            <Card className="bg-muted/40 border cursor-pointer hover:shadow-lg transition-shadow duration-300 border-border rounded-xl">
+            <Card
+              className="bg-muted/40 border cursor-pointer hover:shadow-lg transition-shadow duration-300 border-border rounded-xl"
+              onClick={() =>
+                router.push(`/dashboard/interview/${interview.id}`)
+              }
+            >
               <CardContent className="p-6">
                 <div className="flex justify-between items-start gap-4">
                   <div className="flex items-center gap-3">
