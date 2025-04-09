@@ -1,3 +1,4 @@
+import { CustomBtn } from "@/components/CustomBtn";
 import { Button } from "@/components/ui/button";
 import Feature from "@/components/ui/feature";
 import Link from "next/link";
@@ -13,20 +14,11 @@ export default function Home() {
           Get customized mock interview questions based on your job role,
           skills, and experience. Prepare smarter with AI.
         </p>
+        <CustomBtn />
       </section>
 
       <section className="max-w-5xl mx-auto grid md:grid-cols-3 gap-8 mb-20">
         {features.map((feature) => (
-          // <div
-          //   key={feature.title}
-          //   className="border border-border bg-card p-6 rounded-xl shadow-sm hover:shadow-md transition-all"
-          // >
-          //   <div className="text-3xl mb-4">{feature.icon}</div>
-          //   <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
-          //   <p className="text-sm text-muted-foreground">
-          //     {feature.description}
-          //   </p>
-          // </div>
           <Feature
             title={feature.title}
             description={feature.description}

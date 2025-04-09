@@ -40,3 +40,14 @@ export async function fetchInterview({ id }: { id: string }) {
   const response = await axios.get(`http://localhost:3000/api/interview/${id}`);
   return response.data;
 }
+
+export async function updateQuestionStatus({
+  questionId,
+}: {
+  questionId: string;
+}) {
+  const response = await axios.put(
+    `http://localhost:3000/api/interview/${questionId}/question`
+  );
+  return response.data;
+}

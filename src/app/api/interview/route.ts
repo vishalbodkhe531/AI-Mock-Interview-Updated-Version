@@ -33,7 +33,7 @@ export async function POST(req: Request) {
       });
     }
 
-    const user = await prisma.user.create({
+    await prisma.user.create({
       data: {
         uid: userId,
         userName,

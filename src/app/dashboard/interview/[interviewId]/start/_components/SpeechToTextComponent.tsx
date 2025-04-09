@@ -1,22 +1,12 @@
 "use client";
 import { Button } from "@/components/ui/button";
+import { updateQuestionStatus } from "@/lib/user.action";
 import { ParseResultType } from "@/types/user.types";
 import { chatSession } from "@/utils/gemeniAIMode";
 import { Mic } from "lucide-react";
 import { useEffect, useState } from "react";
 import useSpeechToText from "react-hook-speech-to-text";
 import toast from "react-hot-toast";
-
-type QuestionFeedback = {
-  currentQuestion: {
-    answer: string;
-    question: string;
-    isCompleted: boolean;
-    question_number: number;
-  };
-  feedback: string;
-  rating: number;
-};
 
 const SpeechToTextComponent = ({
   currentQuestion,
@@ -102,10 +92,12 @@ const SpeechToTextComponent = ({
 
       if (currentQuestion) {
         currentQuestion.aifeed = parsed;
-        currentQuestion.isCompleted = true;
+        // currentQuestion.isCompleted = true;
+        await updateQuestionStatus({
+          questionId: currentQuestion!.questionId,
+        });
       }
 
-      console.log("currentQuestion : ", currentQuestion);
       setUserAns("");
     } catch (err) {
       console.error("Error parsing AI response:", err);
@@ -116,6 +108,11 @@ const SpeechToTextComponent = ({
   if (error) {
     console.error("Speech to text error:", error);
   }
+  console.log(currentQuestion, "currentQuestion");
+
+  // const updateQuestion = async () => {
+  //   await updateQuestionStatus({ questionId: currentQuestion!.questionId });
+  // };
 
   return (
     <div className="flex justify-center item-center mt-10 shadow-2xl my-7 border-l-2 p-10">
@@ -141,7 +138,7 @@ const SpeechToTextComponent = ({
         <Button
           disabled={currentQuestion?.isCompleted}
           onClick={handleClickAns}
-          className="w-full"
+          className="w-full cursor-pointer"
           variant="outline"
         >
           Show Answer

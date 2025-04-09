@@ -8,7 +8,7 @@ import { useUser } from "@clerk/nextjs";
 import { motion } from "framer-motion";
 import { Briefcase, Code, Database } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { JSX, useEffect, useState } from "react";
+import { useEffect, useState, useCallback, JSX } from "react";
 import Loading from "./loading";
 
 interface Interview {
@@ -35,19 +35,22 @@ const InterviewListPage = () => {
   const [interviewData, setInterviewData] = useState<Interview[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      if (user?.id) {
-        setLoading(true);
-        const data = await fetchAllInterviews({ id: user.id });
-        setInterviewData(data);
-        setLoading(false);
-      }
-    };
-    fetchData();
+  const fetchData = useCallback(async () => {
+    if (!user?.id) return;
+    setLoading(true);
+    try {
+      const data = await fetchAllInterviews({ id: user.id });
+      setInterviewData(data);
+    } finally {
+      setLoading(false);
+    }
   }, [user?.id]);
 
-  if (loading) return <Loading />;
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  if (!user || loading) return <Loading />;
 
   return (
     <main className="min-h-screen px-6 md:px-20 py-12 bg-background text-foreground select-none">
@@ -61,12 +64,12 @@ const InterviewListPage = () => {
       </motion.h1>
 
       <div className="grid gap-6">
-        {interviewData.map((interview, index) => (
+        {interviewData.map((interview) => (
           <motion.div
-            key={index}
+            key={interview.id}
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.1 }}
+            transition={{ delay: 0.1 }}
           >
             <Card
               className="bg-muted/40 border cursor-pointer hover:shadow-lg transition-shadow duration-300 border-border rounded-xl"
