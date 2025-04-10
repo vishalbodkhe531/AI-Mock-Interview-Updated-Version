@@ -12,15 +12,15 @@ import { useEffect, useState, useCallback, JSX } from "react";
 import Loading from "./loading";
 
 interface Interview {
-  title: string;
   id: string;
-  role: string;
   jobDesc: string;
+  role: string;
   experience: string;
-  jsonMockResp: {
+  questions: {
+    id: string;
     question: string;
     answer: string;
-    isCompleted?: boolean;
+    isCompleted: boolean;
   }[];
 }
 
@@ -40,7 +40,10 @@ const InterviewListPage = () => {
     setLoading(true);
     try {
       const data = await fetchAllInterviews({ id: user.id });
-      setInterviewData(data);
+      setInterviewData(data || []);
+    } catch (error) {
+      console.error("Error fetching interviews:", error);
+      setInterviewData([]);
     } finally {
       setLoading(false);
     }
@@ -85,10 +88,10 @@ const InterviewListPage = () => {
                     )}
                     <div>
                       <h2 className="text-xl font-semibold text-primary">
-                        {interview.title}
+                        {interview.role}
                       </h2>
                       <p className="text-sm text-muted-foreground">
-                        {interview.role}
+                        {interview.jobDesc}
                       </p>
                     </div>
                   </div>

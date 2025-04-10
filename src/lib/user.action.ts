@@ -18,21 +18,21 @@ export async function createInterview({ parseResult, userInfo }: PropesType) {
 export async function fetchAllInterviews({ id }: { id: string }) {
   try {
     if (!id) {
-      return {
-        success: false,
-        message: "Id is required",
-      };
+      throw new Error("Id is required");
     }
 
     const response = await axios.get(
       `http://localhost:3000/api/interview/all/${id}`
     );
-    return response.data;
+
+    if (!response.data.success) {
+      throw new Error(response.data.message || "Failed to fetch interviews");
+    }
+
+    return response.data.interviews;
   } catch (error) {
-    return {
-      success: false,
-      message: "Error while fetching interview data",
-    };
+    console.error("Error fetching interviews:", error);
+    return [];
   }
 }
 

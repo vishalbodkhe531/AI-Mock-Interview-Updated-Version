@@ -92,7 +92,6 @@ const SpeechToTextComponent = ({
 
       if (currentQuestion) {
         currentQuestion.aifeed = parsed;
-        // currentQuestion.isCompleted = true;
         await updateQuestionStatus({
           questionId: currentQuestion!.questionId,
         });
