@@ -8,6 +8,8 @@ export async function PUT(
   try {
     const { id } = params;
 
+    const { AIfeedback } = await req.json();
+
     if (!id) {
       return NextResponse.json(
         { error: "Invalid question ID" },
@@ -19,8 +21,11 @@ export async function PUT(
       where: { id },
       data: {
         isCompleted: true,
+        AIfeedback,
       },
     });
+
+    console.log("updated : ", updated);
 
     return NextResponse.json({
       success: true,

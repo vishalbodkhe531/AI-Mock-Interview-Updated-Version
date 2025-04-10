@@ -43,11 +43,19 @@ export async function fetchInterview({ id }: { id: string }) {
 
 export async function updateQuestionStatus({
   questionId,
+  AIfeedback,
 }: {
   questionId: string;
+  AIfeedback: string;
 }) {
   const response = await axios.put(
-    `http://localhost:3000/api/interview/${questionId}/question`
+    `http://localhost:3000/api/interview/${questionId}/question`,
+    { AIfeedback },
+    {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
   );
   console.log("response.data : ", response.data);
   return response.data;
