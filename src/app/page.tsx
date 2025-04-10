@@ -68,3 +68,6 @@ const features = [
     icon: "📱",
   },
 ];
+
+
+// 1. Tailored Questions
