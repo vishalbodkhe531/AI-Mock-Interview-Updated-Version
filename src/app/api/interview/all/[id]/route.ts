@@ -7,7 +7,7 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    const { id } = await params;
+    const { id } = params;
 
     if (!id) {
       return NextResponse.json({ error: "Invalid ID" }, { status: 400 });
@@ -15,16 +15,34 @@ export async function GET(
 
     const result = await prisma.mockInterview.findMany({
       where: { userId: id },
+      include: {
+        questions: {
+          select: {
+            id: true,
+            question: true,
+            isCompleted: true,
+            answer: true,
+          },
+        },
+      },
+      orderBy: {
+        id: "desc",
+      },
     });
 
-    if (!result) {
-      return NextResponse.json(
-        { error: "Interview not found" },
-        { status: 404 }
-      );
+    if (!result || result.length === 0) {
+      return NextResponse.json({
+        success: true,
+        interviews: [],
+        message: "No interviews found",
+      });
     }
 
-    return NextResponse.json(result);
+    return NextResponse.json({
+      success: true,
+      interviews: result,
+      message: "Interviews successfully fetched",
+    });
   } catch (error) {
     return NextResponse.json(
       { error: "Error while fetching interview data" },

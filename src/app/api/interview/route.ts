@@ -6,62 +6,54 @@ import { NextResponse } from "next/server";
 export async function POST(req: Request) {
   try {
     const { parseResult, userInfo } = await req.json();
-    const { userId, userName, profilePic, jobDesc, role, experience } =
-      userInfo;
+    const { userId, userName, profilePic, jobDesc, role, experience } = userInfo;
 
-    const isUserExist = await prisma.user.findUnique({
-      where: {
-        uid: userId,
-      },
+    // First ensure user exists
+    let user = await prisma.user.findUnique({
+      where: { uid: userId },
     });
 
-    if (isUserExist) {
-      const mockResponse = await prisma.mockInterview.create({
+    if (!user) {
+      user = await prisma.user.create({
         data: {
-          jsonMockResp: parseResult,
-          userId,
-          jobDesc,
-          role,
-          experience,
+          uid: userId,
+          userName,
+          profilePic,
         },
-      });
-
-      return NextResponse.json({
-        sucess: true,
-        mockId: mockResponse.id,
-        message: "Data successfully store into the database",
       });
     }
 
-    await prisma.user.create({
+    // Create mock interview with questions
+    const mockInterview = await prisma.mockInterview.create({
       data: {
-        uid: userId,
-        userName,
-        profilePic,
-      },
-    });
-
-    const mockResponse = await prisma.mockInterview.create({
-      data: {
-        jsonMockResp: parseResult,
         userId,
         jobDesc,
         role,
         experience,
+        questions: {
+          create: parseResult.map((question: any) => ({
+            question: question.question,
+            answer: question.answer,
+            isCompleted: false
+          }))
+        }
       },
+      include: {
+        questions: true
+      }
     });
-
-    console.log("mockResponse : ", mockResponse);
 
     return NextResponse.json({
-      sucess: true,
-      mockId: mockResponse.id,
-      message: "Data successfully store into the database",
+      success: true,
+      mockId: mockInterview.id,
+      message: "Interview and questions successfully created"
     });
+
   } catch (error) {
+    console.error("Error creating interview:", error);
     return NextResponse.json(
-      { error: "Error while store interview data" },
-      { status: 400 }
+      { error: "Error while storing interview data" },
+      { status: 500 }
     );
   }
 }

@@ -24,8 +24,6 @@ function QuestionSection({
   const [hint, setHint] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
 
-  console.log(interviewData);
-
   const speechRef = useRef<SpeechSynthesisUtterance | null>(null);
 
   useEffect(() => {
@@ -35,11 +33,12 @@ function QuestionSection({
       try {
         setLoading(true);
         const res = await fetchInterview({ id: interviewId as string });
-        console.log(res);
-        const { jsonMockResp } = res?.result;
-        if (jsonMockResp?.length) {
-          setInterviewData(jsonMockResp);
-          setCurrentQuestion(jsonMockResp[0]);
+        console.log("res : ", res);
+
+        const { questions } = res?.result;
+        if (questions?.length) {
+          setInterviewData(questions);
+          setCurrentQuestion(questions[0]);
         }
       } catch (error) {
         console.error("Error fetching interview data:", error);
@@ -71,7 +70,7 @@ function QuestionSection({
   const handleQuestionClick = useCallback(
     (item: ParseResultType, idx: number) => {
       if (speechSynthesis.speaking) speechSynthesis.cancel();
-      setHint(false); // reset hint
+      setHint(false);
       setCurrentQuestion(item);
       setActiveQuestionIdx(idx);
       setIsSpeaking(false);

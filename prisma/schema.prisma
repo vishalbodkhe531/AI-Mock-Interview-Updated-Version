@@ -1,3 +1,31 @@
+// generator client {
+//   provider = "prisma-client-js"
+// }
+
+// datasource db {
+//   provider = "postgresql"
+//   url      = env("DATABASE_URL")
+// }
+
+// model User {
+//   uid        String @id @unique
+//   userName   String?
+//   profilePic String?
+//   mocks      MockInterview[]
+// }
+
+// model MockInterview {
+//   id           String    @id @default(cuid()) @unique
+//   jsonMockResp Json
+//   jobDesc      String
+//   role         String
+//   experience   String  
+//   userId       String  
+//   user         User      @relation(fields: [userId], references: [uid], onDelete: Cascade)
+//   @@map("mockInterview")
+// }
+
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -8,19 +36,29 @@ datasource db {
 }
 
 model User {
-  uid        String @id @unique
+  uid        String           @id @unique
   userName   String?
   profilePic String?
   mocks      MockInterview[]
 }
 
 model MockInterview {
-  id           String    @id @default(cuid()) @unique
-  jsonMockResp Json
+  id           String            @id @default(cuid()) @unique
   jobDesc      String
   role         String
   experience   String  
-  userId       String  
-  user         User      @relation(fields: [userId], references: [uid], onDelete: Cascade)
+  userId       String
+  user         User              @relation(fields: [userId], references: [uid], onDelete: Cascade)
+  questions    MockQuestion[]    // New relation for questions
   @@map("mockInterview")
+}
+
+model MockQuestion {
+  id            String   @id @default(cuid()) @unique
+  question      String
+  answer        String
+  isCompleted   Boolean  @default(false)
+  mockInterviewId String
+  mockInterview MockInterview @relation(fields: [mockInterviewId], references: [id], onDelete: Cascade)
+  @@map("mockQuestion")
 }

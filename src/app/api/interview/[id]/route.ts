@@ -7,13 +7,24 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    const { id } = await params;
+    const { id } = params;
 
     if (!id) {
       return NextResponse.json({ error: "Invalid ID" }, { status: 400 });
     }
 
-    const result = await prisma.mockInterview.findUnique({ where: { id } });
+    const result = await prisma.mockInterview.findUnique({
+      where: { id },
+      include: {
+        questions: true,
+        user: {
+          select: {
+            userName: true,
+            profilePic: true,
+          },
+        },
+      },
+    });
 
     if (!result) {
       return NextResponse.json(
@@ -25,7 +36,7 @@ export async function GET(
     return NextResponse.json({
       success: true,
       result,
-      message: "Data successfully fetched from the database",
+      message: "Data successfully fetched",
     });
   } catch (error) {
     return NextResponse.json(
