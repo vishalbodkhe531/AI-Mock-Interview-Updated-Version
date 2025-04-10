@@ -49,5 +49,6 @@ export async function updateQuestionStatus({
   const response = await axios.put(
     `http://localhost:3000/api/interview/${questionId}/question`
   );
+  console.log("response.data : ", response.data);
   return response.data;
 }

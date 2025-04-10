@@ -33,7 +33,6 @@ function QuestionSection({
       try {
         setLoading(true);
         const res = await fetchInterview({ id: interviewId as string });
-        console.log("res : ", res);
 
         const { questions } = res?.result;
         if (questions?.length) {

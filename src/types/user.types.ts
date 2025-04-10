@@ -20,7 +20,7 @@ export interface ParseResultType {
   experience: string;
   isCompleted: boolean;
   answer: string;
-  questionId: string;
+  id: string;
   aifeed?: {
     rating: number;
     feedback: string;

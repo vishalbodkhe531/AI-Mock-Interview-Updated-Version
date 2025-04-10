@@ -1,36 +1,36 @@
-"use server";
 import { prisma } from "@/lib/prisma";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
-export async function GET(
-  req: Request,
+export async function PUT(
+  req: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
-    const { id } = await params;
+    const { id } = params;
 
     if (!id) {
-      return NextResponse.json({ error: "Invalid ID" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Invalid question ID" },
+        { status: 400 }
+      );
     }
 
-    await prisma.mockInterview.update({
+    const updated = await prisma.mockQuestion.update({
       where: { id },
       data: {
-        jsonMockResp: {
-          update: {
-            isCompleted: true,
-          },
-        },
+        isCompleted: true,
       },
     });
 
     return NextResponse.json({
       success: true,
-      message: "Interview completed",
+      message: "Question marked as completed",
+      data: updated,
     });
-  } catch (error) {
+  } catch (error: any) {
+    console.error("Update failed:", error.message);
     return NextResponse.json(
-      { error: "Error while updating interview data" },
+      { error: "Failed to update question", details: error.message },
       { status: 500 }
     );
   }
