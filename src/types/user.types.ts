@@ -21,7 +21,7 @@ export interface ParseResultType {
   isCompleted: boolean;
   answer: string;
   id: string;
-  aifeed?: {
+  AIfeedback?: {
     rating: number;
     feedback: string;
   };

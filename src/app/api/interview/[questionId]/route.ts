@@ -4,17 +4,17 @@ import { NextResponse } from "next/server";
 
 export async function GET(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: { questionId: string } }
 ) {
   try {
-    const { id } = await params;
+    const { questionId } = await params;
 
-    if (!id) {
+    if (!questionId) {
       return NextResponse.json({ error: "Invalid ID" }, { status: 400 });
     }
 
     const result = await prisma.mockInterview.findUnique({
-      where: { id },
+      where: { id: questionId },
       include: {
         questions: true,
         user: {

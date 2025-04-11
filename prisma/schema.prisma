@@ -31,7 +31,7 @@ model MockQuestion {
   id            String   @id @default(cuid()) @unique
   question      String
   answer        String
-  AIfeedback    String?     
+  AIfeedback    Json?     
   isCompleted   Boolean  @default(false)
   mockInterviewId String
   mockInterview MockInterview @relation(fields: [mockInterviewId], references: [id], onDelete: Cascade)

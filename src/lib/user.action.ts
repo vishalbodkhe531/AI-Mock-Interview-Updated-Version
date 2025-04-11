@@ -1,6 +1,7 @@
 "use client";
 import { PropesType } from "@/types/user.types";
 import axios from "axios";
+import toast from "react-hot-toast";
 
 export async function createInterview({ parseResult, userInfo }: PropesType) {
   const response = await axios.post(
@@ -48,15 +49,23 @@ export async function updateQuestionStatus({
   questionId: string;
   AIfeedback: string;
 }) {
-  const response = await axios.put(
-    `http://localhost:3000/api/interview/${questionId}/question`,
-    { AIfeedback },
-    {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    }
-  );
-  console.log("response.data : ", response.data);
-  return response.data;
+  console.log("questionId : ", questionId);
+  console.log("AIfeedback : ", AIfeedback);
+
+  try {
+    const response = await axios.put(
+      `http://localhost:3000/api/interview/${questionId}/question`,
+      { AIfeedback },
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    toast.success("You can now answer the next question!");
+    return response.data;
+  } catch (error) {
+    console.error("Error updating question status:", error);
+    throw error;
+  }
 }
