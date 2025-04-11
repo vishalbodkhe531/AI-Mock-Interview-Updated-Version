@@ -52,7 +52,7 @@ export async function PUT(
   { params }: { params: { questionId: string } }
 ) {
   try {
-    const { questionId } = params;
+    const { questionId } = await params;
     const { AIfeedback } = await req.json();
 
     if (!questionId) {

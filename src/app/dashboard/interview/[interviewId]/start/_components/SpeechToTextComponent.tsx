@@ -82,14 +82,14 @@ const SpeechToTextComponent = ({
 
       const formatted = textResponse.replace(/```json|```/g, "").trim();
       const parsed = JSON.parse(formatted);
-      console.log("parsed", parsed);
 
       if (currentQuestion) {
         currentQuestion.AIfeedback = parsed;
-        await updateQuestionStatus({
+        const { data } = await updateQuestionStatus({
           questionId: currentQuestion.id,
           AIfeedback: parsed,
         });
+        console.log("dataFedback : ", data);
       }
 
       setUserAns("");
@@ -150,24 +150,13 @@ const SpeechToTextComponent = ({
           </div>
         )}
 
-        {/* {currentQuestion?.isCompleted && currentQuestion?.aifeed && (
+        {currentQuestion?.isCompleted && (
           <div className="mt-6 p-4 border rounded-md bg-green-50 shadow">
             <p className="font-semibold">
-              Rating: {currentQuestion?.aifeed?.rating} / 10
+              Rating: {currentQuestion!.AIfeedback!.rating} / 10
             </p>
             <p className="text-gray-700 mt-2">
-              {currentQuestion?.aifeed?.feedback}
-            </p>
-          </div>
-        )} */}
-
-        {currentQuestion?.isCompleted && currentQuestion?.AIfeedback && (
-          <div className="mt-6 p-4 border rounded-md bg-green-50 shadow">
-            <p className="font-semibold">
-              Rating: {currentQuestion.AIfeedback.rating} / 10
-            </p>
-            <p className="text-gray-700 mt-2">
-              {currentQuestion.AIfeedback.feedback}
+              {currentQuestion!.AIfeedback!.feedback}
             </p>
           </div>
         )}
