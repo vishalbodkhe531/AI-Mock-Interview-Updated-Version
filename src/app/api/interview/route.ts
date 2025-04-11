@@ -6,9 +6,9 @@ import { NextResponse } from "next/server";
 export async function POST(req: Request) {
   try {
     const { parseResult, userInfo } = await req.json();
-    const { userId, userName, profilePic, jobDesc, role, experience } = userInfo;
+    const { userId, userName, profilePic, jobDesc, role, experience } =
+      userInfo;
 
-    // First ensure user exists
     let user = await prisma.user.findUnique({
       where: { uid: userId },
     });
@@ -23,7 +23,6 @@ export async function POST(req: Request) {
       });
     }
 
-    // Create mock interview with questions
     const mockInterview = await prisma.mockInterview.create({
       data: {
         userId,
@@ -34,21 +33,20 @@ export async function POST(req: Request) {
           create: parseResult.map((question: any) => ({
             question: question.question,
             answer: question.answer,
-            isCompleted: false
-          }))
-        }
+            isCompleted: false,
+          })),
+        },
       },
       include: {
-        questions: true
-      }
+        questions: true,
+      },
     });
 
     return NextResponse.json({
       success: true,
       mockId: mockInterview.id,
-      message: "Interview and questions successfully created"
+      message: "Interview and questions successfully created",
     });
-
   } catch (error) {
     console.error("Error creating interview:", error);
     return NextResponse.json(

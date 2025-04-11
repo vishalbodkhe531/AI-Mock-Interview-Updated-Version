@@ -25,9 +25,6 @@ export async function GET(
           },
         },
       },
-      orderBy: {
-        id: "desc",
-      },
     });
 
     if (!result || result.length === 0) {

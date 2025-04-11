@@ -37,6 +37,7 @@ function QuestionSection({
         const { questions } = res?.result;
         if (questions?.length) {
           setInterviewData(questions);
+          console.log("questions[0] : ", questions[0]);
           setCurrentQuestion(questions[0]);
         }
       } catch (error) {

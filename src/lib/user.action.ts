@@ -49,9 +49,6 @@ export async function updateQuestionStatus({
   questionId: string;
   AIfeedback: string;
 }) {
-  console.log("questionId : ", questionId);
-  console.log("AIfeedback : ", AIfeedback);
-
   try {
     const response = await axios.put(
       `http://localhost:3000/api/interview/${questionId}/question`,

@@ -59,16 +59,16 @@ const SpeechToTextComponent = ({
   };
 
   const handleClickAns = async () => {
-    if (userAns.trim().split(" ").length < 10) {
-      toast.error("Speak at least 10 words");
+    // if (userAns.trim().split(" ").length < 10) {
+    //   toast.error("Speak at least 10 words");
 
-      if (isRecording) {
-        handleStopRecording();
-      }
+    //   if (isRecording) {
+    //     handleStopRecording();
+    //   }
 
-      setUserAns("");
-      return;
-    }
+    //   setUserAns("");
+    //   return;
+    // }
 
     setIsLoading(true);
 
