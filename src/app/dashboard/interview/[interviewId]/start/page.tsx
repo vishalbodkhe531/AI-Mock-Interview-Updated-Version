@@ -7,11 +7,18 @@ import { ParseResultType } from "@/types/user.types";
 
 function StartInterview() {
   const [currentQuestion, setCurrentQuestion] = useState<ParseResultType>();
+  const [isUpdated, setIsUpdated] = useState(0);
 
   return (
     <div className="grid grid-cols-1  lg:grid-cols-2 ">
-      <QuestionSection setCurrentQuestion={setCurrentQuestion} />
-      <RecordAndAnsSection currentQuestion={currentQuestion} />
+      <QuestionSection
+        setCurrentQuestion={setCurrentQuestion}
+        isUpdated={isUpdated}
+      />
+      <RecordAndAnsSection
+        currentQuestion={currentQuestion}
+        setIsUpdated={setIsUpdated}
+      />
     </div>
   );
 }

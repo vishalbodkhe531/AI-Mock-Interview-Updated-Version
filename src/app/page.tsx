@@ -1,4 +1,3 @@
-import { CustomBtn } from "@/components/CustomBtn";
 import { Button } from "@/components/ui/button";
 import Feature from "@/components/ui/feature";
 import Link from "next/link";
@@ -14,7 +13,6 @@ export default function Home() {
           Get customized mock interview questions based on your job role,
           skills, and experience. Prepare smarter with AI.
         </p>
-        <CustomBtn />
       </section>
 
       <section className="max-w-5xl mx-auto grid md:grid-cols-3 gap-8 mb-20">
@@ -68,6 +66,5 @@ const features = [
     icon: "📱",
   },
 ];
-
 
 // 1. Tailored Questions

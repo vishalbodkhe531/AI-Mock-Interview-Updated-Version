@@ -1,5 +1,4 @@
 "use client";
-import { useTheme } from "next-themes";
 import ModeToggle from "@/components/ui/ModeToggle";
 import {
   SignedIn,
@@ -7,16 +6,16 @@ import {
   SignInButton,
   SignUpButton,
   UserButton,
-  useUser,
 } from "@clerk/nextjs";
+import { useTheme } from "next-themes";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { IoHome } from "react-icons/io5";
-import { MdDashboard } from "react-icons/md";
 import { FaQuestion } from "react-icons/fa";
 import { HiSparkles } from "react-icons/hi";
+import { IoHome } from "react-icons/io5";
+import { MdDashboard } from "react-icons/md";
 
 function Navbar() {
   const path = usePathname();
@@ -54,11 +53,6 @@ function Navbar() {
             href: "/questions",
             label: "Questions",
             icon: <FaQuestion className="inline-block mr-1 text-lg" />,
-          },
-          {
-            href: "/upgrade",
-            label: "Upgrade",
-            icon: <HiSparkles className="inline-block mr-1 text-lg" />,
           },
         ].map(({ href, label, icon }) => (
           <Link href={href} key={href}>

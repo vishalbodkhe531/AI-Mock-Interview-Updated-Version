@@ -25,12 +25,17 @@ const SpeechToTextComponent = dynamic(
 
 const RecordAndAnsSection = ({
   currentQuestion,
+  setIsUpdated,
 }: {
   currentQuestion?: ParseResultType;
+  setIsUpdated: React.Dispatch<React.SetStateAction<number>>;
 }) => {
   return (
     <Suspense fallback={<div>Loading...</div>}>
-      <SpeechToTextComponent currentQuestion={currentQuestion} />
+      <SpeechToTextComponent
+        currentQuestion={currentQuestion}
+        setIsUpdated={setIsUpdated}
+      />
     </Suspense>
   );
 };

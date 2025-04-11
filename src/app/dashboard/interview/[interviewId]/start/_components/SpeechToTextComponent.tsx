@@ -10,8 +10,10 @@ import toast from "react-hot-toast";
 
 const SpeechToTextComponent = ({
   currentQuestion,
+  setIsUpdated,
 }: {
   currentQuestion?: ParseResultType;
+  setIsUpdated: React.Dispatch<React.SetStateAction<number>>;
 }) => {
   const [userAns, setUserAns] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -59,16 +61,16 @@ const SpeechToTextComponent = ({
   };
 
   const handleClickAns = async () => {
-    // if (userAns.trim().split(" ").length < 10) {
-    //   toast.error("Speak at least 10 words");
+    if (userAns.trim().split(" ").length < 10) {
+      toast.error("Speak at least 10 words");
 
-    //   if (isRecording) {
-    //     handleStopRecording();
-    //   }
+      if (isRecording) {
+        handleStopRecording();
+      }
 
-    //   setUserAns("");
-    //   return;
-    // }
+      setUserAns("");
+      return;
+    }
 
     setIsLoading(true);
 
@@ -89,7 +91,7 @@ const SpeechToTextComponent = ({
           questionId: currentQuestion.id,
           AIfeedback: parsed,
         });
-        console.log("dataFedback : ", data);
+        setIsUpdated((val) => val + 1);
       }
 
       setUserAns("");
@@ -103,21 +105,19 @@ const SpeechToTextComponent = ({
 
   if (error) console.error("Speech to text error:", error);
 
-  console.log("currentQuestion : ", currentQuestion);
-
   return (
     <div className="flex justify-center items-center mt-10 shadow-2xl my-7 border-l-2 p-10">
       <div className="flex flex-col gap-4 w-full">
         <Button
           disabled={currentQuestion?.isCompleted}
-          className={`mt-10 w-full shadow-xl border-2 ${
+          className={`mt-10 cursor-pointer w-full shadow-xl border-2  ${
             isRecording ? "py-7" : ""
           }`}
           variant="outline"
           onClick={isRecording ? handleStopRecording : handleStartRecording}
         >
           {isRecording ? (
-            <div className="flex flex-col items-center text-red-600">
+            <div className="flex flex-col items-center text-red-600 ">
               <Mic className="animate-pulse" />
               <span>Recording...</span>
             </div>
@@ -129,7 +129,7 @@ const SpeechToTextComponent = ({
         <Button
           disabled={currentQuestion?.isCompleted || isLoading}
           onClick={handleClickAns}
-          className="w-full"
+          className="w-full cursor-pointer"
           variant="outline"
         >
           {isLoading ? (
@@ -138,7 +138,7 @@ const SpeechToTextComponent = ({
               Analyzing Answer...
             </div>
           ) : (
-            "Show Answer"
+            "Check Feedback"
           )}
         </Button>
 
@@ -152,7 +152,7 @@ const SpeechToTextComponent = ({
 
         {currentQuestion?.isCompleted && (
           <div className="mt-6 p-4 border rounded-md bg-green-50 shadow">
-            <p className="font-semibold">
+            <p className="font-semibold text-red-800">
               Rating: {currentQuestion!.AIfeedback!.rating} / 10
             </p>
             <p className="text-gray-700 mt-2">

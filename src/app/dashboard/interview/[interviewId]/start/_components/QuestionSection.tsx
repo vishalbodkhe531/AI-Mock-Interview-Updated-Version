@@ -12,8 +12,10 @@ import Loading from "./loading";
 
 function QuestionSection({
   setCurrentQuestion,
+  isUpdated,
 }: {
   setCurrentQuestion: (item: ParseResultType) => void;
+  isUpdated: number;
 }) {
   const { interviewId } = useParams();
   const router = useRouter();
@@ -37,7 +39,6 @@ function QuestionSection({
         const { questions } = res?.result;
         if (questions?.length) {
           setInterviewData(questions);
-          console.log("questions[0] : ", questions[0]);
           setCurrentQuestion(questions[0]);
         }
       } catch (error) {
@@ -48,7 +49,7 @@ function QuestionSection({
     };
 
     fetchAPI();
-  }, [interviewId, setCurrentQuestion]);
+  }, [interviewId, setCurrentQuestion, isUpdated]);
 
   const textToSpeech = useCallback((text: string) => {
     if (!("speechSynthesis" in window)) {
