@@ -51,7 +51,7 @@ export async function updateQuestionStatus({
 }) {
   try {
     const response = await axios.put(
-      `http://localhost:3000/api/interview/${questionId}/question`,
+      `http://localhost:3000/api/interview/${questionId}`,
       { AIfeedback },
       {
         headers: {
