@@ -3,12 +3,19 @@
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
-export async function GET(
-  req: Request,
-  { params }: { params: { id: string } }
-) {
+type SegmentParams<T extends Object = any> = T extends Record<string, any>
+  ? {
+      [K in keyof T]: T[K] extends string
+        ? string | string[] | undefined
+        : never;
+    }
+  : T;
+
+type RouteContext = { params: Promise<SegmentParams> };
+
+export async function GET(req: Request, context: RouteContext) {
   try {
-    const { id } = await params;
+    const { id } = await context.params;
 
     if (!id) {
       return NextResponse.json({ error: "Invalid ID" }, { status: 400 });
