@@ -28,8 +28,7 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            <Navbar />
-            <div className="mx-5 md:mc-20 lg:mx-36 ">{children}</div>
+            {children}
           </ThemeProvider>
         </body>
       </html>

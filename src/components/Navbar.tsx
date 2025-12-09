@@ -1,17 +1,19 @@
 "use client";
+
 import ModeToggle from "@/components/ui/ModeToggle";
 import {
   SignedIn,
   SignedOut,
-  SignInButton,
-  SignUpButton,
   UserButton,
 } from "@clerk/nextjs";
+import { useClerk } from "@clerk/nextjs";
+
 import { useTheme } from "next-themes";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+
 import {
   FaQuestion,
   FaSignInAlt,
@@ -28,6 +30,8 @@ function Navbar() {
   const [mounted, setMounted] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
+  const { openSignIn, openSignUp } = useClerk();
+
   useEffect(() => {
     setMounted(true);
   }, []);
@@ -36,32 +40,22 @@ function Navbar() {
 
   const activeTextColor =
     theme === "dark" ? "text-indigo-300" : "text-blue-500";
+
   const hoverTextColor =
     theme === "dark" ? "hover:text-indigo-300" : "hover:text-blue-400";
 
   const navItems = [
-    {
-      href: "/",
-      label: "Home",
-      icon: <IoHome className="inline-block mr-1 text-lg" />,
-    },
-    {
-      href: "/dashboard",
-      label: "Dashboard",
-      icon: <MdDashboard className="inline-block mr-1 text-lg" />,
-    },
-    {
-      href: "/questions",
-      label: "Questions",
-      icon: <FaQuestion className="inline-block mr-1 text-lg" />,
-    },
+    { href: "/", label: "Home", icon: <IoHome className="inline-block mr-1 text-lg" /> },
+    { href: "/dashboard", label: "Dashboard", icon: <MdDashboard className="inline-block mr-1 text-lg" /> },
+    { href: "/questions", label: "Questions", icon: <FaQuestion className="inline-block mr-1 text-lg" /> },
   ];
 
   const closeMenu = () => setMenuOpen(false);
 
   return (
-    <header className="bg-secondary w-full shadow-md">
+    <header className="w-full shadow-md bg-secondary dark:bg-gray-900">
       <div className="flex justify-between items-center px-4 py-3 md:px-8 relative">
+
         {/* Logo */}
         <Link href="/" className="flex items-center">
           <Image src="/logo.png" alt="Logo" width={60} height={60} />
@@ -72,13 +66,10 @@ function Navbar() {
           {navItems.map(({ href, label, icon }) => (
             <Link href={href} key={href}>
               <li
-                className={`list-none cursor-pointer flex items-center text-sm uppercase tracking-wider transition-colors duration-200 ease-in-out ${
-                  path === href
-                    ? `${activeTextColor} font-semibold`
-                    : theme === "dark"
-                    ? "text-gray-300"
-                    : "text-gray-700"
-                } ${hoverTextColor}`}
+                className={`list-none cursor-pointer flex items-center text-sm uppercase tracking-wider transition-colors duration-200 ease-in-out ${path === href
+                  ? `${activeTextColor} font-semibold`
+                  : "text-gray-700 dark:text-gray-300"
+                  } ${hoverTextColor}`}
               >
                 {icon}
                 {label}
@@ -88,62 +79,77 @@ function Navbar() {
           <ModeToggle />
         </nav>
 
-        <div className="hidden md:flex items-center gap-4">
+        <div className="hidden md:flex items-center gap-4 text-gray-700 dark:text-gray-300">
           <SignedOut>
-            <div className="flex items-center gap-2">
+            <div
+              className="flex items-center gap-2 cursor-pointer"
+              onClick={() => openSignIn()}
+            >
               <FaSignInAlt />
-              <SignInButton />
+              <span>Sign in</span>
             </div>
-            <div className="flex items-center gap-2">
+
+            <div
+              className="flex items-center gap-2 cursor-pointer"
+              onClick={() => openSignUp()}
+            >
               <FaUserPlus />
-              <SignUpButton />
+              <span>Sign up</span>
             </div>
           </SignedOut>
+
           <SignedIn>
             <UserButton />
           </SignedIn>
         </div>
 
-        <div className="md:hidden z-50">
-          <button onClick={() => setMenuOpen((prev) => !prev)}>
+        <div className="md:hidden z-50 text-gray-800 dark:text-gray-200">
+          <button onClick={() => setMenuOpen((p) => !p)}>
             {menuOpen ? <FaTimes size={22} /> : <FaBars size={22} />}
           </button>
         </div>
       </div>
 
       {menuOpen && (
-        <div className="md:hidden absolute top-[70px] left-0 w-full bg-secondary px-6 py-4 z-40 border-t">
+        <div className="md:hidden absolute top-[70px] left-0 w-full bg-secondary dark:bg-gray-900 px-6 py-4 z-40 border-t border-gray-300 dark:border-gray-700">
           <ul className="flex flex-col gap-4">
             {navItems.map(({ href, label, icon }) => (
               <Link href={href} key={href} onClick={closeMenu}>
                 <li
-                  className={`flex items-center text-sm uppercase tracking-wider ${
-                    path === href
-                      ? `${activeTextColor} font-semibold`
-                      : theme === "dark"
-                      ? "text-gray-300"
-                      : "text-gray-700"
-                  } ${hoverTextColor}`}
+                  className={`flex items-center text-sm uppercase tracking-wider ${path === href
+                    ? `${activeTextColor} font-semibold`
+                    : "text-gray-700 dark:text-gray-300"
+                    } ${hoverTextColor}`}
                 >
                   {icon}
                   {label}
                 </li>
               </Link>
             ))}
+
             <div className="pt-2">
               <ModeToggle />
             </div>
-            <div className="pt-4 flex flex-col gap-2">
+
+            <div className="pt-4 flex flex-col gap-2 text-gray-800 dark:text-gray-200">
               <SignedOut>
-                <div className="flex items-center gap-2">
+                <div
+                  className="flex items-center gap-2 cursor-pointer"
+                  onClick={() => openSignIn()}
+                >
                   <FaSignInAlt />
-                  <SignInButton />
+                  <span>Sign in</span>
                 </div>
-                <div className="flex items-center gap-2">
+
+                <div
+                  className="flex items-center gap-2 cursor-pointer"
+                  onClick={() => openSignUp()}
+                >
                   <FaUserPlus />
-                  <SignUpButton />
+                  <span>Sign up</span>
                 </div>
               </SignedOut>
+
               <SignedIn>
                 <UserButton />
               </SignedIn>
