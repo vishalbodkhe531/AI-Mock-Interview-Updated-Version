@@ -20,7 +20,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { createInterview } from "@/lib/user.action";
 
 import { formType, UserDataType } from "@/types/user.types";
-import { chatSession } from "@/utils/gemeniAIMode";
 import { useUser } from "@clerk/nextjs";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
@@ -57,44 +56,37 @@ function AddNewInterview() {
 
   const { handleSubmit, reset } = form;
 
+  // this was for gemini
   // const onSubmit = async (data: formType) => {
   //   setLoading(true);
   //   try {
-  //     const inputPrompt = `Job Position : ${data.role} , Job Skills : ${data.jobDesc} , Years of experience : ${data.experience} , Dependes on this information please give me 7 interview questions with answers in JSON format. Give me questions and answers related to user Job Skills as fields in JSON with unique encrypted complex as questionId to each question.`;
+  //     const inputPrompt = `Job Position: ${data.role}, Job Skills: ${data.jobDesc}, Years of Experience: ${data.experience}. Based on this, provide 7 interview questions with answers in JSON format. Structure: [{ "question": "...", "answer": "...", "AIfeedback": {} }].`;
 
   //     const result = await chatSession.sendMessage(inputPrompt);
 
   //     if (!result || !result.response) {
-  //       toast.error("Something went wrong..!! Please try again.");
+  //       toast.error("Something went wrong. Please try again.");
   //       return;
   //     }
 
-  //     let parseResult;
+
+  //     const textResponse = await result.response.text();
+  //     const formattedResponse = textResponse
+  //       .replace("```json", "")
+  //       .replace("```", "")
+  //       .trim();
+
+  //     let parsedQuestions;
   //     try {
-  //       const textResponse = await result.response.text();
-  //       const formattedResponse = textResponse
-  //         .replace("```json", "")
-  //         .replace("```", "")
-  //         .trim();
-
-  //       console.log("Formatted AI Response:", formattedResponse);
-
-  //       const parseResult = JSON.parse(JSON.stringify(formattedResponse));
-
-  //       // parseResult = Array.isArray(parsed)
-  //       //   ? parsed
-  //       //   : parsed.interviewQuestions || [];
-
-  //       // console.log("Parsed :", parsed);
-  //       // console.log("Parsed Result:", parseResult);
+  //       parsedQuestions = JSON.parse(formattedResponse);
   //     } catch (jsonError) {
   //       console.error("Error parsing AI response:", jsonError);
-  //       toast.error("Failed to parse AI response. Please try again.");
+  //       toast.error("Invalid AI response format. Please try again.");
   //       return;
   //     }
 
-  //     if (!parseResult || !Array.isArray(parseResult)) {
-  //       toast.error("Failed to parse AI response. Please try again.");
+  //     if (!Array.isArray(parsedQuestions)) {
+  //       toast.error("AI did not return questions in expected format.");
   //       return;
   //     }
 
@@ -107,17 +99,15 @@ function AddNewInterview() {
   //       experience: data.experience,
   //     };
 
-  //     try {
-  //       const apiResponse = await createInterview({ parseResult, userInfo });
-  //       toast.success(apiResponse.message);
-  //       console.log("apiResponse mockId : ", apiResponse.mockId);
-  //       router.push(`/dashboard/interview/${apiResponse.mockId}`);
-  //     } catch (apiError) {
-  //       console.error("Error sending data to API:", apiError);
-  //       toast.error("Failed to send data. Please try again.");
-  //     }
+  //     const apiResponse = await createInterview({
+  //       parseResult: parsedQuestions,
+  //       userInfo,
+  //     });
+
+  //     toast.success(apiResponse.message);
+  //     router.push(`/dashboard/interview/${apiResponse.mockId}`);
   //   } catch (error) {
-  //     console.error("Error while fetching AI API:", error);
+  //     console.error("Interview generation error:", error);
   //     toast.error("Something went wrong. Please try again.");
   //   } finally {
   //     setLoading(false);
@@ -127,39 +117,68 @@ function AddNewInterview() {
 
   const onSubmit = async (data: formType) => {
     setLoading(true);
+
     try {
-      const inputPrompt = `Job Position: ${data.role}, Job Skills: ${data.jobDesc}, Years of Experience: ${data.experience}. Based on this, provide 7 interview questions with answers in JSON format. Structure: [{ "question": "...", "answer": "...", "AIfeedback": {} }].`;
+      const inputPrompt = `
+Job Position: ${data.role}
+Job Skills: ${data.jobDesc}
+Years of Experience: ${data.experience}
 
-      const result = await chatSession.sendMessage(inputPrompt);
+Generate exactly 7 interview questions in strict JSON format:
 
-      if (!result || !result.response) {
-        toast.error("Something went wrong. Please try again.");
+[
+  { "question": "...", "answer": "...", "AIfeedback": {} },
+  ...
+]
+
+Return ONLY the JSON array — do NOT include markdown or surrounding text.
+`;
+
+      const resp = await fetch("/api/openrouter", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt: inputPrompt }),
+      });
+
+      console.log("resp : ", resp);
+
+
+      const json = await resp.json();
+
+      if (!json.success) {
+        console.error("OpenRouter server failed:", json);
+        toast.error(json.error || "AI request failed");
         return;
       }
 
-      const textResponse = await result.response.text();
+      let textResponse: string = json.text ?? "";
+      if (!textResponse) {
+        toast.error("AI returned empty response");
+        return;
+      }
+
       const formattedResponse = textResponse
-        .replace("```json", "")
-        .replace("```", "")
+        .replace(/```json/gi, "")
+        .replace(/```/g, "")
         .trim();
 
-      let parsedQuestions;
+      let parsedQuestions: any;
       try {
         parsedQuestions = JSON.parse(formattedResponse);
-      } catch (jsonError) {
-        console.error("Error parsing AI response:", jsonError);
-        toast.error("Invalid AI response format. Please try again.");
+      } catch (parseErr) {
+        console.error("Failed to parse AI JSON:", parseErr, formattedResponse);
+        toast.error("AI returned invalid JSON. Try again or refine the prompt.");
         return;
       }
 
       if (!Array.isArray(parsedQuestions)) {
-        toast.error("AI did not return questions in expected format.");
+        toast.error("AI did not return a JSON array of questions.");
         return;
       }
 
       const userInfo: UserDataType = {
         userId: user!.id,
-        userName: user!.fullName!,
+        userName: user!.fullName ?? user!.username ?? "Unknown",
         profilePic: user!.imageUrl,
         jobDesc: data.jobDesc,
         role: data.role,
@@ -171,16 +190,17 @@ function AddNewInterview() {
         userInfo,
       });
 
-      toast.success(apiResponse.message);
+      toast.success(apiResponse.message || "Interview created");
       router.push(`/dashboard/interview/${apiResponse.mockId}`);
-    } catch (error) {
-      console.error("Interview generation error:", error);
+    } catch (err) {
+      console.error("onSubmit error:", err);
       toast.error("Something went wrong. Please try again.");
     } finally {
       setLoading(false);
       setOpenDailog(false);
     }
   };
+
 
   const handleClose = () => {
     setOpenDailog(false);

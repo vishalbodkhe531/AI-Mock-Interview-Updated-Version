@@ -21,7 +21,6 @@ function Dashboard() {
           </div>
         </div>
 
-        {/* Right section - Image and Button */}
         <div className="flex flex-col items-center gap-6">
           <Image
             src={dashImg}

@@ -2,8 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { updateQuestionStatus } from "@/lib/user.action";
 import { ParseResultType } from "@/types/user.types";
-import { chatSession } from "@/utils/gemeniAIMode";
-import { Mic, Loader2 } from "lucide-react";
+import { Loader2, Mic } from "lucide-react";
 import { useEffect, useState } from "react";
 import useSpeechToText from "react-hook-speech-to-text";
 import toast from "react-hot-toast";
@@ -60,13 +59,55 @@ const SpeechToTextComponent = ({
     }
   };
 
+  // this was for gemini 
+  // const handleClickAns = async () => {
+  //   if (userAns.trim().split(" ").length < 10) {
+  //     toast.error("Speak at least 10 words");
+
+  //     if (isRecording) {
+  //       handleStopRecording();
+  //     }
+
+  //     setUserAns("");
+  //     return;
+  //   }
+
+  //   setIsLoading(true);
+
+  //   const prompt = `Question: "${currentQuestion?.question}"\nAnswer: "${userAns}"\n\nBased on the answer, give feedback and a rating out of 10. Respond in JSON format like:\n{\n  "rating": 8,\n  "feedback": "Your answer was clear but could include more real-world examples."\n}`;
+
+  //   try {
+  //     const result = await chatSession.sendMessage(prompt);
+  //     const textResponse = await result?.response?.text();
+
+  //     if (!textResponse) throw new Error("Empty response");
+
+  //     const formatted = textResponse.replace(/```json|```/g, "").trim();
+  //     const parsed = JSON.parse(formatted);
+
+  //     if (currentQuestion) {
+  //       currentQuestion.AIfeedback = parsed;
+  //       const { data } = await updateQuestionStatus({
+  //         questionId: currentQuestion.id,
+  //         AIfeedback: parsed,
+  //       });
+  //       setIsUpdated((val) => val + 1);
+  //     }
+
+  //     setUserAns("");
+  //   } catch (err) {
+  //     console.error("AI response error:", err);
+  //     toast.error("Failed to process AI feedback. Try again.");
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
+
   const handleClickAns = async () => {
     if (userAns.trim().split(" ").length < 10) {
       toast.error("Speak at least 10 words");
 
-      if (isRecording) {
-        handleStopRecording();
-      }
+      if (isRecording) handleStopRecording();
 
       setUserAns("");
       return;
@@ -74,34 +115,69 @@ const SpeechToTextComponent = ({
 
     setIsLoading(true);
 
-    const prompt = `Question: "${currentQuestion?.question}"\nAnswer: "${userAns}"\n\nBased on the answer, give feedback and a rating out of 10. Respond in JSON format like:\n{\n  "rating": 8,\n  "feedback": "Your answer was clear but could include more real-world examples."\n}`;
+    const prompt = `
+Question: "${currentQuestion?.question}"
+Answer: "${userAns}"
+
+Based on the answer, give feedback and a rating out of 10.
+Return STRICT JSON ONLY:
+
+{
+  "rating": 8,
+  "feedback": "Your answer was clear but could include more real-world examples."
+}
+`;
 
     try {
-      const result = await chatSession.sendMessage(prompt);
-      const textResponse = await result?.response?.text();
+      const aiRes = await fetch("/api/openrouter", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt }),
+      });
 
-      if (!textResponse) throw new Error("Empty response");
+      const aiJson = await aiRes.json();
 
-      const formatted = textResponse.replace(/```json|```/g, "").trim();
-      const parsed = JSON.parse(formatted);
+      if (!aiJson.success) {
+        console.error("OpenRouter error:", aiJson.error);
+        toast.error("AI request failed");
+        return;
+      }
+
+      const cleanText = aiJson.text
+        .replace(/```json/gi, "")
+        .replace(/```/g, "")
+        .trim();
+
+      let parsedFeedback;
+      try {
+        parsedFeedback = JSON.parse(cleanText);
+      } catch (err) {
+        console.error("JSON parse error:", cleanText);
+        toast.error("AI returned invalid JSON.");
+        return;
+      }
 
       if (currentQuestion) {
-        currentQuestion.AIfeedback = parsed;
-        const { data } = await updateQuestionStatus({
+        currentQuestion.AIfeedback = parsedFeedback;
+
+        await updateQuestionStatus({
           questionId: currentQuestion.id,
-          AIfeedback: parsed,
+          AIfeedback: parsedFeedback,
         });
-        setIsUpdated((val) => val + 1);
+
+        setIsUpdated((v) => v + 1);
       }
 
       setUserAns("");
+
     } catch (err) {
       console.error("AI response error:", err);
-      toast.error("Failed to process AI feedback. Try again.");
+      toast.error("Failed to process AI feedback.");
     } finally {
       setIsLoading(false);
     }
   };
+
 
   if (error) console.error("Speech to text error:", error);
 
@@ -110,9 +186,8 @@ const SpeechToTextComponent = ({
       <div className="flex flex-col gap-4 w-full">
         <Button
           disabled={currentQuestion?.isCompleted}
-          className={`mt-10 cursor-pointer w-full shadow-xl border-2  ${
-            isRecording ? "py-7" : ""
-          }`}
+          className={`mt-10 cursor-pointer w-full shadow-xl border-2  ${isRecording ? "py-7" : ""
+            }`}
           variant="outline"
           onClick={isRecording ? handleStopRecording : handleStartRecording}
         >
